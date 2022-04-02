@@ -46,7 +46,6 @@ namespace Chardonnay1erCru {
         /// <summary>
         /// Envoie un message au serveur
         /// </summary>
-        /// <param name="message"></param>
         public void SendMessage(string message) => OutStream.WriteLine(message);
 
         /// <summary>
@@ -115,7 +114,9 @@ namespace Chardonnay1erCru {
 
         }
 
-        /// Attend le début du tour de jeu
+        /// <summary>
+        /// Bloque le thread appellant jusqu'au début du tour de jeu<br/>
+        /// Au moment ou le tour de jeu commence, raffraichie les listes de <see cref="Pick"/> et <see cref="Deck"/>
         /// </summary>
         public void WaitForTurn() {
 

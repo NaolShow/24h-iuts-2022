@@ -7,13 +7,13 @@ namespace Chardonnay1erCru {
     public class Pick {
 
         private NetworkManager Manager;
-
         public Pick(NetworkManager manager) => Manager = manager;
 
+        private List<Card> _Cards = new List<Card>();
         /// <summary>
-        /// Représente les cartes de la pioche
+        /// Liste des cartes qui sont disponibles au centre
         /// </summary>
-        public List<Card> Cards = new List<Card>();
+        public IReadOnlyList<Card> Cards => _Cards;
 
         public Card Get(int cardId) {
 
@@ -26,7 +26,7 @@ namespace Chardonnay1erCru {
         public void Refresh() {
 
             // On clear la liste de cartes
-            Cards.Clear();
+            _Cards.Clear();
 
             // On demande le sommet et on récupère le string splitté
             Manager.SendMessage("SOMMET");
@@ -37,7 +37,7 @@ namespace Chardonnay1erCru {
 
             // On boucle sur tous les arguments
             // => On ajoute la carte à la liste des sommets
-            foreach (string cardText in splitted.Skip(1)) Cards.Add(Card.GetCard(cardText));
+            foreach (string cardText in splitted.Skip(1)) _Cards.Add(Card.GetCard(cardText));
 
         }
 
