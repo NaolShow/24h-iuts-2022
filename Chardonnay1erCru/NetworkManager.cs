@@ -53,6 +53,41 @@ namespace Chardonnay1erCru {
 
         }
 
+        /// <summary>
+        /// Enumeration du joueur à attaquer
+        /// </summary>
+        public enum Cible
+        {
+            GAUCHE,
+            DROITE
+        }
+
+        /// <summary>
+        /// Methode pour poser une carte. Envoie la requête "POSER" au serveur
+        /// </summary>
+        /// <param name="bouteille">La bouteille qui sera posée</param>
+        public void Poser(Bouteille bouteille)
+        {
+            OutStream.WriteLine($"POSER|{bouteille}");
+        }
+
+        /// <summary>
+        /// Sabote un joueur. Envoie la requête "SABOTER" au serveur
+        /// </summary>
+        /// <param name="cible">La cible a saboter</param>
+        public void Saboter(Cible cible)
+        {
+            switch (cible)
+            {
+                case Cible.GAUCHE:
+                    OutStream.WriteLine($"SABOTER|-1");
+                    break;
+                case Cible.DROITE:
+                    OutStream.WriteLine($"SABOTER|1");
+                    break;
+            }
+        }
+
     }
 
 }
