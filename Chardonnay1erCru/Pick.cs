@@ -15,14 +15,26 @@ namespace Chardonnay1erCru {
         /// </summary>
         public IReadOnlyList<Card> Cards => _Cards;
 
+        /// <summary>
+        /// Récupère une carte de la pioche et l'ajoute au deck<br/>
+        /// (Donc met à jour la liste de cartes du Deck)
+        /// </summary>
         public Card Get(int cardId) {
 
             // On pioche et on récupère la carte prise
             Manager.SendMessage($"PIOCHER|{cardId}");
-            return Card.GetCard(Manager.GetMessage().Split('|')[1]);
+
+            // On récupère la carte piochée et on l'ajoute au deck
+            Card card = Card.GetCard(Manager.GetMessage().Split('|')[1]);
+            Manager.Deck.AddPickedCard(card);
+
+            return card;
 
         }
 
+        /// <summary>
+        /// Rafraichie la liste des cartes de la pioche
+        /// </summary>
         public void Refresh() {
 
             // On clear la liste de cartes

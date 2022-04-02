@@ -10,6 +10,36 @@ namespace Chardonnay1erCru {
         /// </summary>
         public IReadOnlyList<Card> Cards => _Cards;
 
+        /// <summary>
+        /// Renvoie vrai si notre deck est plein
+        /// </summary>
+        public bool IsFull => _Cards.Count >= 16;
+
+        /// <summary>
+        /// Renvoie vrai si nous disposons dans notre deck d'une bouteille vide
+        /// </summary>
+        public bool HaveEmptyBottle {
+            get {
+
+                // On boucle sur toutes les cartes
+                foreach (Card card in _Cards) {
+
+                    // Si c'est une bouteille vide, on renvoie vrai
+                    if (!card.IsGrape && card.Type == CardType.Bouteille) return true;
+
+                }
+                return false;
+
+            }
+        }
+
+        /// <summary>
+        /// Ajoute une carte au deck car nous venons de la piochée
+        /// </summary>
+        public void AddPickedCard(Card card) => _Cards.Add(card);
+        /// <summary>
+        /// Rafraichie la liste des cartes du deck
+        /// </summary>
         public void Refresh(string msg) {
 
             // On récupère tous les arguments

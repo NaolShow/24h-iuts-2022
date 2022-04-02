@@ -6,23 +6,26 @@ namespace Chardonnay1erCru {
 
         static void Main(string[] args) {
 
-            // On initialize l'intramuros et la connexion au serveur de jeu
-            //InNetworkManager inManager = new InNetworkManager();
+            // On initialise la connexion au serveur de jeu et on s'inscrit
             NetworkManager manager = new NetworkManager();
-
             manager.Join();
 
             while (true) {
 
-                Console.WriteLine("Attente de mon tour...");
+                // On attends le début de notre tour de jeu
                 manager.WaitForTurn();
-                Console.WriteLine("Début du tour");
 
-                Console.WriteLine("Carte prise: " + manager.Pick.Get(0));
+                // PHASE 1
+                // => On récupère la carte du milieu
                 Console.WriteLine("Carte prise: " + manager.Pick.Get(1));
 
+                // PHASE 2
+                // => On récupère la carte du milieu
+                Console.WriteLine("Carte prise: " + manager.Pick.Get(1));
+
+                // PHASE 3
+                // => On passe son tour ou on défausse
                 manager.PasserTour();
-                Console.ReadLine();
 
             }
 
