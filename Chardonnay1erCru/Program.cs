@@ -11,10 +11,20 @@ namespace Chardonnay1erCru {
             NetworkManager manager = new NetworkManager();
 
             manager.Join();
-            manager.WaitForTurn();
-            manager.Sommet();
 
-            foreach (Card bouteille in manager.WinesSommet) Console.WriteLine(bouteille);
+            while (true) {
+
+                Console.WriteLine("Attente de mon tour...");
+                manager.WaitForTurn();
+                Console.WriteLine("Début du tour");
+
+                Console.WriteLine("Carte prise: " + manager.Pick.Get(0));
+                Console.WriteLine("Carte prise: " + manager.Pick.Get(1));
+
+                manager.PasserTour();
+                Console.ReadLine();
+
+            }
 
             Console.ReadLine();
 

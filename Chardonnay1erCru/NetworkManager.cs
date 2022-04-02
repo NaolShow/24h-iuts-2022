@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Sockets;
 
 namespace Chardonnay1erCru {
@@ -16,6 +14,9 @@ namespace Chardonnay1erCru {
         private TcpClient Client;
         private StreamReader InStream;
         private StreamWriter OutStream;
+
+        public Deck Deck { get; }
+        public Pick Pick { get; }
 
         /// <summary>
         /// Creer une instance de Network Manager qui se connecte au jeu
@@ -32,12 +33,21 @@ namespace Chardonnay1erCru {
                 AutoFlush = true
             };
 
+            // On initialise le deck
+            Deck = new Deck();
+            Pick = new Pick(this);
+
         }
 
         /// <summary>
         /// Renvoie un message du serveur (bloque le thread en attendant)
         /// </summary>
         public string GetMessage() => InStream.ReadLine();
+        /// <summary>
+        /// Envoie un message au serveur
+        /// </summary>
+        /// <param name="message"></param>
+        public void SendMessage(string message) => OutStream.WriteLine(message);
 
         /// <summary>
         /// Rejoint le serveur de jeu et renvoie vrai si cela s'est passé correctement
@@ -56,22 +66,20 @@ namespace Chardonnay1erCru {
 
         }
 
-        public void PasserTour()
-        {
-            OutStream.WriteLine("DEFAUSSER");
-        }
-        public void Defausser(int x1, int x2 = 0)
-        {
-            string def;
-            if (x2 == 0)
-            {
-                def = "DEFAUSSER|" + x1;
-            }
+        public void PasserTour() {
 
-            else {
+            OutStream.WriteLine("DEFAUSSER");
+            System.Console.WriteLine("Passer: " + InStream.ReadLine());
+
+        }
+        public void Defausser(int x1, int x2 = 0) {
+            string def;
+            if (x2 == 0) {
+                def = "DEFAUSSER|" + x1;
+            } else {
                 def = "DEFAUSSER|" + x1 + "|" + x2;
             }
-            
+
             OutStream.WriteLine(def);
         }
         /// <summary>
@@ -110,28 +118,16 @@ namespace Chardonnay1erCru {
         /// Attend le début du tour de jeu
         /// </summary>
         public void WaitForTurn() {
-            while (InStream.ReadLine() != "DEBUT_TOUR") System.Threading.Thread.Sleep(20);
-        }
 
-        public List<Card> WinesSommet = new List<Card>();
-        /// <summary>
-        /// Met à jour la liste des vins (uniquement lorsque c'est notre tour)
-        /// </summary>
-        public void Sommet() {
+            // On attend que l'on reçois le message début tour
+            string message = string.Empty;
+            while (!message.StartsWith("DEBUT_TOUR")) message = InStream.ReadLine();
 
-            // On clear la liste des sommets
-            WinesSommet.Clear();
+            Console.WriteLine("Message de début: " + message);
 
-            // On demande le sommet et on récupère le string splitté
-            OutStream.WriteLine("SOMMET");
-            string[] splitted = InStream.ReadLine().Split('|');
-
-            // Si la réponse de la commande n'est pas bonne
-            if (splitted[0] != "OK") throw new Exception("Une erreur est survenue lors du sommet?");
-
-            // On boucle sur tous les arguments
-            // => On ajoute la carte à la liste des sommets
-            foreach (string cardText in splitted.Skip(1)) WinesSommet.Add(Card.GetCard(cardText));
+            // On refresh le deck et le pick
+            Deck.Refresh(message);
+            Pick.Refresh();
 
         }
 
