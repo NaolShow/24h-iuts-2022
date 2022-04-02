@@ -104,7 +104,7 @@ namespace Chardonnay1erCru {
 
             // Si nous avons moins de 2 bouteilles, on en prend une
             Dictionary<CardType, double> quantities = Manager.Deck.QA;
-            if (quantities[CardType.Bouteille] < 2 && TryPick((card) => card.Type == CardType.Bouteille)) return;
+            if (quantities[CardType.Bouteille] < 1 && TryPick((card) => card.Type == CardType.Bouteille)) return;
 
             // Si c'est 3 bouteilles
             if (Manager.Pick.Cards[0].Type == CardType.Bouteille && Manager.Pick.Cards[1].Type == CardType.Bouteille && Manager.Pick.Cards[2].Type == CardType.Bouteille) {
@@ -124,6 +124,13 @@ namespace Chardonnay1erCru {
             // Pinot 6 et 5
             if (TryPick((card) => card.Type == CardType.Pinot && card.Quantity >= 6)) return;
             if (TryPick((card) => card.Type == CardType.Pinot && card.Quantity >= 5)) return;
+            if (TryPick((card) => card.Type == CardType.Pinot && card.Quantity >= 4)) return;
+            if (TryPick((card) => card.Type == CardType.Pinot && card.Quantity >= 3)) return;
+
+            // Chardonnay 6 et 5
+            if (TryPick((card) => card.Type == CardType.Chardonnay && card.Quantity >= 6)) return;
+            if (TryPick((card) => card.Type == CardType.Chardonnay && card.Quantity >= 5)) return;
+            if (TryPick((card) => card.Type == CardType.Chardonnay && card.Quantity >= 4)) return;
 
             // Si on peut saboter, on sabote forcément la personne de gauche
             if (Manager.Deck.HaveSabotage) {
@@ -169,7 +176,7 @@ namespace Chardonnay1erCru {
             if (TryPick((card) => card.Type == CardType.Chardonnay && card.Quantity >= 5)) return;
 
             // On vérifie les quantités si on a moins de 2 bouteilles on prend
-            if (quantities[CardType.Bouteille] < 2 && TryPick((card) => card.Type == CardType.Bouteille)) return;
+            if (quantities[CardType.Bouteille] < 1 && TryPick((card) => card.Type == CardType.Bouteille)) return;
 
             // Si c'est 3 bouteilles
             if (Manager.Pick.Cards[0].Type == CardType.Bouteille && Manager.Pick.Cards[1].Type == CardType.Bouteille && Manager.Pick.Cards[2].Type == CardType.Bouteille) {
