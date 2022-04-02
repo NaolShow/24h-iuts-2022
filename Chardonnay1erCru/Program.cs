@@ -1,9 +1,14 @@
-﻿using System;
+﻿namespace Chardonnay1erCru {
 
-namespace Chardonnay1erCru {
     internal class Program {
+
         static void Main(string[] args) {
-            Console.WriteLine("Hello World!");
+
+            NetworkManager manager = new NetworkManager();
+
+
         }
+
     }
+
 }
