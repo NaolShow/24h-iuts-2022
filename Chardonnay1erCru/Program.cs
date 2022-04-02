@@ -141,6 +141,8 @@ namespace Chardonnay1erCru {
             CardType highestCardType = CardType.Gamay;
             foreach (KeyValuePair<CardType, double> pair in totaux) {
 
+                if (pair.Key == CardType.Pinot) continue;
+
                 if (pair.Value > highest) {
 
                     highest = pair.Value;
@@ -150,7 +152,12 @@ namespace Chardonnay1erCru {
 
             }
 
-            if ((highest > 35 && quantities[CardType.Bouteille] >= 2) || highest > 80) {
+            if (totaux[CardType.Pinot] > 150 || totaux[CardType.Pinot] > 80 && Manager.Deck.Cards.Count > 13) {
+
+                Manager.Poser(CardType.Pinot);
+                return;
+
+            } else if ((highest > 35 && quantities[CardType.Bouteille] >= 2) || highest > 80) {
 
                 Manager.Poser(highestCardType);
                 return;
@@ -174,31 +181,60 @@ namespace Chardonnay1erCru {
 
         }
 
-        private static int GetLowestCard() {
+        private static int GetBaddestCard() {
 
-            int lowestQuantity = int.MaxValue;
-            int id = 0;
+            // On choppe le pire type de carte que l'on a
+            Dictionary<CardType, double> cards = Manager.Deck.ScoreNotSommet();
+            CardType badType = CardType.Gamay;
+            double badValue = int.MaxValue;
+            foreach (KeyValuePair<CardType, double> pair in cards) {
 
-            for (int i = 0; i < Manager.Deck.Cards.Count; i++) {
-
-                if (lowestQuantity > Manager.Deck.Cards[i].Quantity) {
-                    id = i;
-                    lowestQuantity = Manager.Deck.Cards[i].Quantity;
+                if (pair.Value < badValue) {
+                    badType = pair.Key;
+                    badValue = pair.Value;
                 }
 
             }
 
-            Manager.Deck.RemoveCard(id);
-            return id;
+            // On boucle sur tout le deck
+            double baddestQuantity = int.MaxValue;
+            int baddestIndex = 0;
+            for (int i = 0; i < Manager.Deck.Cards.Count; i++) {
 
+                // Si c'est du mauvais type
+                if (badType != Manager.Deck.Cards[i].Type) continue;
+
+                if (baddestQuantity > Manager.Deck.Cards[i].Quantity) {
+                    baddestQuantity = Manager.Deck.Cards[i].Quantity;
+                    baddestIndex = i;
+                }
+
+            }
+            Manager.Deck.RemoveCard(baddestIndex);
+            return baddestIndex;
         }
 
         private static void Phase3() {
 
             int cardCount = Manager.Deck.Cards.Count;
 
-            if (cardCount == 15) Manager.Defausser(GetLowestCard());
-            else if (cardCount == 16) Manager.Defausser(GetLowestCard(), GetLowestCard());
+            Dictionary<CardType, double> quantities = Manager.Deck.QuantiteAdditionee();
+
+            List<int> bouteilles = new List<int>();
+            if (quantities[CardType.Bouteille] > 3) {
+
+                for (int i = 0; i < cardCount; i++) {
+
+                    if (Manager.Deck.Cards[i].Type == CardType.Bouteille) bouteilles.Add(i);
+
+                }
+
+            }
+
+            if (bouteilles.Count > 1) Manager.Defausser(bouteilles[0], bouteilles[1]);
+            else if (bouteilles.Count > 0) Manager.Defausser(bouteilles[0]);
+            else if (cardCount == 15) Manager.Defausser(GetBaddestCard());
+            else if (cardCount == 16) Manager.Defausser(GetBaddestCard(), GetBaddestCard());
             else Manager.PasserTour();
 
         }
@@ -219,48 +255,6 @@ namespace Chardonnay1erCru {
                     Phase1();
                     Phase2();
                     Phase3();
-                    // PHASE 2
-                    // => On récupère la carte du milieu
-
-                    // Si on a une bouteille vide on produit
-                    /**
-                    bool producted = false;
-                    if (Manager.Deck.HaveEmptyBottle) {
-
-                        foreach (Card card in Manager.Deck.Cards) {
-
-                            if (card.IsGrape && card.Type == CardType.Aligote) {
-
-                                Console.WriteLine("ON POSE DU " + card);
-                                Manager.Poser(card);
-                                producted = true;
-                                break;
-                            }
-
-                        }
-
-                    }
-
-                    if (!producted) **/
-
-                    // PHASE 3
-                    // => On passe son tour ou on défausse
-
-                    /**
-                    List<int> toDefauss = new List<int>();
-                    for (int i = 0; i < Manager.Deck.Cards.Count; i++) {
-                        break;
-                        if (Manager.Deck.Cards[i].IsGrape && Manager.Deck.Cards[i].Type == CardType.Aligote) {
-
-                            toDefauss.Add(i);
-                            if (toDefauss.Count >= 2) break;
-
-                        }
-                    }**/
-                    /**
-                    if (toDefauss.Count == 0) Manager.PasserTour();
-                    else if (toDefauss.Count == 1) Manager.Defausser(toDefauss[0]);
-                    else if (toDefauss.Count == 2) Manager.Defausser(toDefauss[0], toDefauss[1]);**/
 
                 }
 
