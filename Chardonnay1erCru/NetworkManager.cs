@@ -56,10 +56,23 @@ namespace Chardonnay1erCru {
 
         }
 
-
-        public void Defausser(int x1, int x2)
+        public void PasserTour()
         {
-            OutStream.WriteLine("DEFAUSSER|")
+            OutStream.WriteLine("DEFAUSSER");
+        }
+        public void Defausser(int x1, int x2 = 0)
+        {
+            string def;
+            if (x2 == 0)
+            {
+                def = "DEFAUSSER|" + x1;
+            }
+
+            else {
+                def = "DEFAUSSER|" + x1 + "|" + x2;
+            }
+            
+            OutStream.WriteLine(def);
         }
         /// <summary>
         /// Enumeration du joueur à attaquer
