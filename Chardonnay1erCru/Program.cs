@@ -7,6 +7,49 @@ namespace Chardonnay1erCru {
 
         private static NetworkManager Manager;
 
+        private static void PickHighestValueCards() {
+
+            // On récupère les scores avec et sans pioche
+            Dictionary<CardType, double> scoresNotSommet = Manager.Deck.ScoreNotSommet();
+            Dictionary<CardType, double> scoresSommet = Manager.Deck.ScoreSommet();
+
+            // On calcule la différence de score
+            Dictionary<CardType, double> scores = new Dictionary<CardType, double>();
+            scores[CardType.Gamay] = scoresSommet[CardType.Gamay] - scoresNotSommet[CardType.Gamay];
+            scores[CardType.Pinot] = scoresSommet[CardType.Pinot] - scoresNotSommet[CardType.Pinot];
+            scores[CardType.Chardonnay] = scoresSommet[CardType.Chardonnay] - scoresNotSommet[CardType.Chardonnay];
+            scores[CardType.Aligote] = scoresSommet[CardType.Aligote] - scoresNotSommet[CardType.Aligote];
+
+            CardType bestCard = CardType.Gamay;
+            double highestValue = 0;
+            foreach (KeyValuePair<CardType, double> pair in scores) {
+
+                if (pair.Value > highestValue) {
+                    highestValue = pair.Value;
+                    bestCard = pair.Key;
+                }
+
+            }
+
+            double quantity = 0;
+            int highestid = -1;
+            for (int i = 0; i < Manager.Pick.Cards.Count; i++) {
+
+                if (Manager.Pick.Cards[i].Type != bestCard) continue;
+
+                if (highestid == -1 || Manager.Pick.Cards[i].Quantity > quantity) {
+
+                    highestid = i;
+                    quantity = Manager.Pick.Cards[i].Quantity;
+
+                }
+
+            }
+
+            Manager.Pick.Get(highestid);
+
+        }
+
         private static bool TryPick(Func<Card, bool> shouldPick) {
 
             // On boucle sur toutes les cartes
@@ -51,51 +94,25 @@ namespace Chardonnay1erCru {
             // Pinot 6 et 5
             if (TryPick((card) => card.Type == CardType.Pinot && card.Quantity >= 6)) return;
             if (TryPick((card) => card.Type == CardType.Pinot && card.Quantity >= 5)) return;
+            if (TryPick((card) => card.Type == CardType.Pinot && card.Quantity >= 4)) return;
+            if (TryPick((card) => card.Type == CardType.Pinot && card.Quantity >= 3)) return;
 
             // Chardonnay 6 et 5
             if (TryPick((card) => card.Type == CardType.Chardonnay && card.Quantity >= 6)) return;
             if (TryPick((card) => card.Type == CardType.Chardonnay && card.Quantity >= 5)) return;
+            if (TryPick((card) => card.Type == CardType.Chardonnay && card.Quantity >= 4)) return;
 
-            // On vérifie les quantités si on a moins de 2 bouteilles on prend
+            // Si nous avons moins de 2 bouteilles, on en prend une
             Dictionary<CardType, double> quantities = Manager.Deck.QA;
             if (quantities[CardType.Bouteille] < 2 && TryPick((card) => card.Type == CardType.Bouteille)) return;
 
-            Dictionary<CardType, double> scoresNotSommet = Manager.Deck.ScoreNotSommet();
-            Dictionary<CardType, double> scoresSommet = Manager.Deck.ScoreSommet();
-
-            Dictionary<CardType, double> scores = new Dictionary<CardType, double>();
-            scores[CardType.Gamay] = scoresSommet[CardType.Gamay] - scoresNotSommet[CardType.Gamay];
-            scores[CardType.Pinot] = scoresSommet[CardType.Pinot] - scoresNotSommet[CardType.Pinot];
-            scores[CardType.Chardonnay] = scoresSommet[CardType.Chardonnay] - scoresNotSommet[CardType.Chardonnay];
-            scores[CardType.Aligote] = scoresSommet[CardType.Aligote] - scoresNotSommet[CardType.Aligote];
-
-            CardType bestCard = CardType.Gamay;
-            double highestValue = 0;
-            foreach (KeyValuePair<CardType, double> pair in scores) {
-
-                if (pair.Value > highestValue) {
-                    highestValue = pair.Value;
-                    bestCard = pair.Key;
-                }
-
+            // Si c'est 3 bouteilles
+            if (Manager.Pick.Cards[0].Type == CardType.Bouteille && Manager.Pick.Cards[1].Type == CardType.Bouteille && Manager.Pick.Cards[2].Type == CardType.Bouteille) {
+                Manager.Pick.Get(1);
+                return;
             }
 
-            double quantity = 0;
-            int highestid = -1;
-            for (int i = 0; i < Manager.Pick.Cards.Count; i++) {
-
-                if (Manager.Pick.Cards[i].Type != bestCard) continue;
-
-                if (highestid == -1 || Manager.Pick.Cards[i].Quantity > quantity) {
-
-                    highestid = i;
-                    quantity = Manager.Pick.Cards[i].Quantity;
-
-                }
-
-            }
-
-            Manager.Pick.Get(highestid);
+            PickHighestValueCards();
 
         }
 
@@ -108,6 +125,7 @@ namespace Chardonnay1erCru {
             if (TryPick((card) => card.Type == CardType.Pinot && card.Quantity >= 6)) return;
             if (TryPick((card) => card.Type == CardType.Pinot && card.Quantity >= 5)) return;
 
+            // Si on peut saboter, on sabote forcément la personne de gauche
             if (Manager.Deck.HaveSabotage) {
 
                 Manager.Saboter(NetworkManager.Cible.GAUCHE);
@@ -132,7 +150,7 @@ namespace Chardonnay1erCru {
 
             }
 
-            if ((highest > 50 && quantities[CardType.Bouteille] >= 2) || highest > 120) {
+            if ((highest > 35 && quantities[CardType.Bouteille] >= 2) || highest > 80) {
 
                 Manager.Poser(highestCardType);
                 return;
@@ -152,42 +170,26 @@ namespace Chardonnay1erCru {
                 return;
             }
 
-            Dictionary<CardType, double> scoresNotSommet = Manager.Deck.ScoreNotSommet();
-            Dictionary<CardType, double> scoresSommet = Manager.Deck.ScoreSommet();
+            PickHighestValueCards();
 
-            Dictionary<CardType, double> scores = new Dictionary<CardType, double>();
-            scores[CardType.Gamay] = scoresSommet[CardType.Gamay] - scoresNotSommet[CardType.Gamay];
-            scores[CardType.Pinot] = scoresSommet[CardType.Pinot] - scoresNotSommet[CardType.Pinot];
-            scores[CardType.Chardonnay] = scoresSommet[CardType.Chardonnay] - scoresNotSommet[CardType.Chardonnay];
-            scores[CardType.Aligote] = scoresSommet[CardType.Aligote] - scoresNotSommet[CardType.Aligote];
+        }
 
-            CardType bestCard = CardType.Gamay;
-            double highestValue = 0;
-            foreach (KeyValuePair<CardType, double> pair in scores) {
+        private static int GetLowestCard() {
 
-                if (pair.Value > highestValue) {
-                    highestValue = pair.Value;
-                    bestCard = pair.Key;
+            int lowestQuantity = int.MaxValue;
+            int id = 0;
+
+            for (int i = 0; i < Manager.Deck.Cards.Count; i++) {
+
+                if (lowestQuantity > Manager.Deck.Cards[i].Quantity) {
+                    id = i;
+                    lowestQuantity = Manager.Deck.Cards[i].Quantity;
                 }
 
             }
 
-            double quantity = 0;
-            int highestid = -1;
-            for (int i = 0; i < Manager.Pick.Cards.Count; i++) {
-
-                if (Manager.Pick.Cards[i].Type != bestCard) continue;
-
-                if (highestid == -1 || Manager.Pick.Cards[i].Quantity > quantity) {
-
-                    highestid = i;
-                    quantity = Manager.Pick.Cards[i].Quantity;
-
-                }
-
-            }
-
-            Manager.Pick.Get(highestid);
+            Manager.Deck.RemoveCard(id);
+            return id;
 
         }
 
@@ -195,11 +197,9 @@ namespace Chardonnay1erCru {
 
             int cardCount = Manager.Deck.Cards.Count;
 
-            foreach (Card card in Manager.Deck.Cards)
-
-                if (cardCount == 15) Manager.Defausser(0);
-                else if (cardCount == 16) Manager.Defausser(0, 1);
-                else Manager.PasserTour();
+            if (cardCount == 15) Manager.Defausser(GetLowestCard());
+            else if (cardCount == 16) Manager.Defausser(GetLowestCard(), GetLowestCard());
+            else Manager.PasserTour();
 
         }
 

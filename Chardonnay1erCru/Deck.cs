@@ -58,6 +58,7 @@ namespace Chardonnay1erCru {
         /// Ajoute une carte au deck car nous venons de la piochée
         /// </summary>
         public void AddPickedCard(Card card) => _Cards.Add(card);
+        public void RemoveCard(int id) => _Cards.RemoveAt(id);
         /// <summary>
         /// Rafraichie la liste des cartes du deck
         /// </summary>
