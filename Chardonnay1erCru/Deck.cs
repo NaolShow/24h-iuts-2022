@@ -25,7 +25,7 @@ namespace Chardonnay1erCru {
                 foreach (Card card in _Cards) {
 
                     // Si c'est une bouteille vide, on renvoie vrai
-                    if (!card.IsGrape && card.Type == CardType.Bouteille) return true;
+                    if (card.Type == CardType.Bouteille) return true;
 
                 }
                 return false;
@@ -41,6 +41,9 @@ namespace Chardonnay1erCru {
         /// Rafraichie la liste des cartes du deck
         /// </summary>
         public void Refresh(string msg) {
+
+            // Clear le deck
+            _Cards.Clear();
 
             // On récupère tous les arguments
             string[] splitted = msg.Split('|');

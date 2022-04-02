@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Net.Sockets;
 
 namespace Chardonnay1erCru {
@@ -67,19 +66,32 @@ namespace Chardonnay1erCru {
 
         public void PasserTour() {
 
+            // On défausse une carte
             OutStream.WriteLine("DEFAUSSER");
-            System.Console.WriteLine("Passer: " + InStream.ReadLine());
+
+            // On récupère notre main
+            Deck.Refresh(InStream.ReadLine());
 
         }
-        public void Defausser(int x1, int x2 = 0) {
-            string def;
-            if (x2 == 0) {
-                def = "DEFAUSSER|" + x1;
-            } else {
-                def = "DEFAUSSER|" + x1 + "|" + x2;
-            }
 
-            OutStream.WriteLine(def);
+        public void Defausser(int x) {
+
+            // On défausse une carte
+            OutStream.WriteLine($"DEFAUSSER|{x}");
+
+            // On récupère notre main
+            Deck.Refresh(InStream.ReadLine());
+
+        }
+
+        public void Defausser(int x1, int x2) {
+
+            // On défausse une carte
+            OutStream.WriteLine($"DEFAUSSER|{x1}|{x2}");
+
+            // On récupère notre main
+            Deck.Refresh(InStream.ReadLine());
+
         }
         /// <summary>
         /// Enumeration du joueur à attaquer
@@ -94,7 +106,13 @@ namespace Chardonnay1erCru {
         /// </summary>
         /// <param name="card">La carte qui sera posée</param>
         public void Poser(Card card) {
-            OutStream.WriteLine($"POSER|{card.Type}");
+
+            if (card.Type == CardType.Aligote) OutStream.WriteLine("POSER|Aligoté");
+            else OutStream.WriteLine($"POSER|{card.Type}");
+
+            // On lit notre jeu et on refresh le deck
+            Deck.Refresh(InStream.ReadLine());
+
         }
 
         /// <summary>
@@ -123,8 +141,6 @@ namespace Chardonnay1erCru {
             // On attend que l'on reçois le message début tour
             string message = string.Empty;
             while (!message.StartsWith("DEBUT_TOUR")) message = InStream.ReadLine();
-
-            Console.WriteLine("Message de début: " + message);
 
             // On refresh le deck et le pick
             Deck.Refresh(message);

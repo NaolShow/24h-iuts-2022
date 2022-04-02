@@ -17,6 +17,7 @@
     public enum CardType {
 
         Bouteille,
+        Sabotage,
 
         Aligote,
         Chardonnay,
@@ -27,27 +28,23 @@
 
     public class Card {
 
-        public bool IsGrape { get; set; }
+        /// <summary>
+        /// Détermine si la carte est du raisin ou non
+        /// </summary>
+        public bool IsGrape => Type != CardType.Bouteille && Type != CardType.Sabotage;
         public CardType Type { get; set; }
         public int Quantity { get; set; }
 
         /// <summary>
-        /// Créer une carte "bouteille vide"
+        /// Créer une carte du type donné<br/>
+        /// (A utiliser seulement pour sabotage et bouteille vide)
         /// </summary>
-        public Card() {
-
-            Type = CardType.Bouteille;
-            IsGrape = false;
-
-        }
+        public Card(CardType type) => Type = type;
 
         /// <summary>
         /// Créer une carte raisin ou bouteille avec nom et quantité
         /// </summary>
-        public Card(bool isGrape, CardType card, int quantity) {
-
-            // On indique si c'est un raisin ou une bouteille
-            IsGrape = isGrape;
+        public Card(CardType card, int quantity) {
 
             Type = card;
             Quantity = quantity;
@@ -64,12 +61,18 @@
             // On split le texte avec les ;
             string[] splitted = cardText.Split(';');
 
-            // Si on a qu'un seul argument
-            // => C'est une bouteille vide
-            if (splitted.Length == 1) return new Card();
+            // Si on a qu'un seul argument (soit sabotage ou bouteille)
+            if (splitted.Length == 1) {
+
+                // Si c'est une bouteille
+                if (splitted[0].Equals("BOUTEILLE")) return new Card(CardType.Bouteille);
+                // Si c'est un sabotage
+                else return new Card(CardType.Sabotage);
+
+            }
 
             // On renvoie la carte
-            return new Card(splitted[0].Equals("RAISIN"), splitted[1].ToCardType(), int.Parse(splitted[2]));
+            return new Card(splitted[1].ToCardType(), int.Parse(splitted[2]));
 
         }
 
