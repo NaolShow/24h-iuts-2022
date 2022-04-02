@@ -45,7 +45,7 @@ namespace Chardonnay1erCru {
             string[] splitted = Manager.GetMessage().Split('|');
 
             // Si la réponse de la commande n'est pas bonne
-            if (splitted[0] != "OK") throw new Exception("Une erreur est survenue lors du sommet?");
+            if (splitted[0] != "OK") throw new Exception("Une erreur est survenue lors du sommet? " + splitted[1]);
 
             // On boucle sur tous les arguments
             // => On ajoute la carte à la liste des sommets

@@ -33,7 +33,7 @@ namespace Chardonnay1erCru {
             };
 
             // On initialise le deck
-            Deck = new Deck();
+            Deck = new Deck(this);
             Pick = new Pick(this);
 
         }
@@ -104,11 +104,11 @@ namespace Chardonnay1erCru {
         /// <summary>
         /// Methode pour poser une carte. Envoie la requête "POSER" au serveur
         /// </summary>
-        /// <param name="card">La carte qui sera posée</param>
-        public void Poser(Card card) {
+        /// <param name="cardType">La carte qui sera posée</param>
+        public void Poser(CardType cardType) {
 
-            if (card.Type == CardType.Aligote) OutStream.WriteLine("POSER|Aligoté");
-            else OutStream.WriteLine($"POSER|{card.Type}");
+            if (cardType == CardType.Aligote) OutStream.WriteLine("POSER|Aligoté");
+            else OutStream.WriteLine($"POSER|{cardType}");
 
             // On lit notre jeu et on refresh le deck
             Deck.Refresh(InStream.ReadLine());
@@ -129,6 +129,9 @@ namespace Chardonnay1erCru {
                     OutStream.WriteLine($"SABOTER|1");
                     break;
             }
+
+            // On lit notre jeu et on refresh le deck
+            Deck.Refresh(InStream.ReadLine());
 
         }
 
