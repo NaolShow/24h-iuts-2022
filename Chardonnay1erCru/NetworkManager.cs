@@ -53,6 +53,11 @@ namespace Chardonnay1erCru {
 
         }
 
+        public void Defausser(int x1, int x2)
+        {
+            OutStream.WriteLine("DEFAUSSER|")
+        }
+
     }
 
 }
